@@ -3,11 +3,11 @@ Code used for analysis in Jacox et al. (2020)
 
 ## Pre-processing: 
 
-oisst_ice_mask_monthly.m: Load OISST ice concentration and calculate ice mask (ice presence/absence)
+oisst_ice_mask_monthly.m: Load OISST ice concentration and calculate monthly ice mask (ice presence/absence)
 
 make_oisst_masks.m: Make regional masks to deal with special cases for thermal displacement (e.g., limiting movement between ocean basins, into/out of lakes)
 
-oisst_distance.m: Calculate distance from points on OISST grid to all other points (for use in thermal displacement script)
+oisst_distance.m: Calculate distance from points on OISST grid to all other points
 
 oisst_monthly_average.m: Calculate monthly means of daily OISST
 
