@@ -27,4 +27,4 @@ define_heatwaves.m: Use OISST anomalies to define heatwaves and calculate tradit
 
 thermal_displacement.m: Calculate thermal displacement for all heatwaves (i.e., distance from heatwave location to nearest location with heatwave location’s climatological SST) 
 
-apply_oisst_masks.m: Apply the regional masks to OISST distance fields (called by thermal_displacement)
+apply_oisst_masks.m: Apply the regional masks to OISST distance fields (called by thermal_displacement.m)
