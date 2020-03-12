@@ -1,8 +1,8 @@
 # Thermal_Displacement
 Code used for analysis in Jacox et al. (2020)
-&nbsp
+
 PRE-PROCESSING: 
-&nbsp
+
 oisst_ice_mask_monthly.m: Load OISST ice concentration and calculate ice mask (ice presence/absence)
 
 make_oisst_masks.m: Make regional masks to deal with special cases for thermal displacement (e.g., limiting movement between ocean basins, into/out of lakes)
