@@ -1,5 +1,5 @@
 # Thermal_Displacement
-Code used for analysis in Jacox et al. (2020)
+Code used for analysis in Jacox, Alexander, Bograd, and Scott (2020), Thermal Displacement by Marine Heatwaves
 
 ## Pre-processing: 
 
