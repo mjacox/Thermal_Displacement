@@ -1,14 +1,16 @@
-function define_heatwaves(threshold,period,is_detrend)
+function define_heatwaves(threshold,period,is_detrend,rcp)
 % ============================================
 % Identify heatwaves and calculate traditional metrics (intensity,
 % duration)
 %
-%   define_heatwaves(threshold,period,is_detrend)
+%   define_heatwaves(threshold,period,is_detrend,rcp)
 %
 % Input:
-%   threshold: SSTa percentile to use for heatwave definition (e.g., 90)
-%   period: 'historical' or 'future'
+%   threshold:  SSTa percentile to use for heatwave definition (e.g., 90)
+%   period:     'historical' or 'future'
 %   is_detrend: 1 to detrend anomalies before calculating heatwaves
+%   rcp:        Scenario entered as numeric value (26, 45, or 85)
+%               Only needed if period is 'future'
 %
 % M. Jacox 2020
 % ============================================
@@ -22,43 +24,53 @@ dirout = '~/Dropbox/MHW/Data';
 fprintf('Finding heatwaves\n')
 
 % Years used for climatology to define thresholds
-clim_years = [1982 2010];
+clim_years = [1982 2011];
 
 % Load previously computed sst_anomalies
 switch period
     case 'historical'
         f_an = sprintf('%s/oisst_an_1982-2019',dirout);
         if is_detrend == 1
-            load(f_an,'sst_an_dt','year','lsm');
+            load(f_an,'sst_an_dt','year','month','lsm');
             sst_an = sst_an_dt;
             clear sst_an_dt
             fout = sprintf('%s/oisst_mhw_%dperc_1982-2019_detrended',dirout,threshold);
         else
-            load(f_an,'sst_an','year','lsm')
+            load(f_an,'sst_an','year','month','lsm')
             fout = sprintf('%s/oisst_mhw_%dperc_1982-2019',dirout,threshold);
         end
     case 'future'
-        f_an = sprintf('%s/oisst_cmip_future_an',dirout);
+        f_an = sprintf('%s/oisst_cmip_future_an_rcp%d',dirout,rcp);
         if is_detrend==1
-            load(f_an,'sst_an_dt','year','lsm')
+            load(f_an,'sst_an_dt','year','month','lsm')
             sst_an = sst_an_dt;
             clear sst_an_dt
-            fout = sprintf('%s/oisst_cmip_future_mhw_%dperc_detrended',dirout,threshold);
+            fout = sprintf('%s/oisst_cmip_future_mhw_%dperc_detrended_rcp%d',dirout,threshold,rcp);
         else
-            load(f_an,'sst_an','year','lsm')
-            fout = sprintf('%s/oisst_cmip_future_mhw_%dperc',dirout,threshold);
+            load(f_an,'sst_an','year','month','lsm')
+            fout = sprintf('%s/oisst_cmip_future_mhw_%dperc_rcp%d',dirout,threshold,rcp);
         end
 end
 
-% Find heatwave thresholds for each point
-sst_an_thr = prctile(sst_an(:,:,year>=clim_years(1) & year<=clim_years(2)),threshold,3);
+% Find monthly heatwave thresholds for each point
+% Use 3-month running window, similar to Hobday et al. 11-day running
+% window for daily MHW definition
+for im = 1:12
+    if im == 1
+        sst_an_thr(:,:,im) = prctile(sst_an(:,:,year>=clim_years(1) & year<=clim_years(2) & (month==12 | month<=2)),threshold,3);
+    elseif im == 12
+        sst_an_thr(:,:,im) = prctile(sst_an(:,:,year>=clim_years(1) & year<=clim_years(2) & (month==1 | month>=11)),threshold,3);
+    else
+        sst_an_thr(:,:,im) = prctile(sst_an(:,:,year>=clim_years(1) & year<=clim_years(2) & month>=im-1 & month<=im+1),threshold,3);
+    end
+end
 
 % Define heatwave periods
 [nx,ny,nt] = size(sst_an);
 ishw = zeros(nx,ny,nt);
 for ii = 1:nt
     tmp = zeros(nx,ny);
-    tmp(sst_an(:,:,ii)>=sst_an_thr) = 1;
+    tmp(sst_an(:,:,ii)>=sst_an_thr(:,:,month(ii))) = 1;
     ishw(:,:,ii) = tmp;
 end
 
