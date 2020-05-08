@@ -9,7 +9,7 @@ function oisst_an
 % SET KEY PARAMETERS
 % ========================================
 years = [1982 2019]; % Range of years to be analyzed
-clim_years = [1982 2010]; % Range of years to use for climatology
+clim_years = [1982 2011]; % Range of years to use for climatology
 dirout = '~/Dropbox/MHW/Data'; % output directory
 
 % ========================================

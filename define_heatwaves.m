@@ -9,7 +9,7 @@ function define_heatwaves(threshold,period,is_detrend,rcp)
 %   threshold:  SSTa percentile to use for heatwave definition (e.g., 90)
 %   period:     'historical' or 'future'
 %   is_detrend: 1 to detrend anomalies before calculating heatwaves
-%   rcp:        Scenario entered as numeric value (26, 45, or 85)
+%   rcp:        RCP scenario entered as numeric value (26, 45, or 85)
 %               Only needed if period is 'future'
 %
 % M. Jacox 2020

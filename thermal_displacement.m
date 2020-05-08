@@ -1,4 +1,4 @@
-function thermal_displacement(threshold,period,is_detrend,ilims,jlims)
+function thermal_displacement(threshold,period,is_detrend,ilims,jlims,rcp)
 % =======================================================
 % Calculate horizontal displacement of surface isotherms during
 % marine heatwaves
@@ -6,11 +6,13 @@ function thermal_displacement(threshold,period,is_detrend,ilims,jlims)
 %   thermal_displacement(threshold,period,is_detrend,ilims,jlims)
 %
 % Input:
-%   threshold: SSTa percentile to use for heatwave definition (e.g., 90)
-%   period: 'historical' or 'future'
+%   threshold:  SSTa percentile to use for heatwave definition (e.g., 90)
+%   period:     'historical' or 'future'
 %   is_detrend: 1 to use detrended SST anomalies
-%   ilims: longitude indices to calculate. Full grid is [1 1440]
-%   jlims: latitude indices to calculate. Full grid is [1 720]
+%   ilims:      longitude indices to calculate. Full grid is [1 1440]
+%   jlims:      latitude indices to calculate. Full grid is [1 720]
+%   rcp:        RCP scenario as numeric input (26, 45, or 85)
+%               Only required if period is 'future'
 %
 % Calculating thermal displacements is slow
 % Large areas will take a long time to analyze
@@ -23,7 +25,8 @@ function thermal_displacement(threshold,period,is_detrend,ilims,jlims)
 % Data directory
 dir = '~/Dropbox/MHW/Data';
 
-% Set maximum displacement (to speed up code)
+% Set maximum displacement at distance greater than the largest calculated
+% displacements
 td_max = 3000; % km
 
 % Load previously calculated SST and heatwave data
@@ -43,17 +46,17 @@ switch period
             fout = sprintf('%s/thermal_displacement_%dperc_%d-%d_%d-%d.mat',dir,threshold,ilims(1),ilims(2),jlims(1),jlims(2));
         end
     case 'future'
-        f_an = sprintf('%s/oisst_cmip_future_an',dir);
+        f_an = sprintf('%s/oisst_cmip_future_an_rcp%d',dir,rcp);
         if is_detrend == 1
             load(f_an,'sst','sst_an_dt','lat','lon','year','month')
             sst_an = sst_an_dt;
             clear sst_an_dt
-            f_hw = sprintf('%s/oisst_cmip_future_mhw_%dperc_detrended',dir,threshold);
-            fout = sprintf('%s/thermal_displacement_future_%dperc_detrended_%d-%d_%d-%d.mat',dir,threshold,ilims(1),ilims(2),jlims(1),jlims(2));
+            f_hw = sprintf('%s/oisst_cmip_future_mhw_%dperc_detrended_rcp%d',dir,threshold,rcp);
+            fout = sprintf('%s/thermal_displacement_future_%dperc_detrended_rcp%d_%d-%d_%d-%d.mat',dir,threshold,rcp,ilims(1),ilims(2),jlims(1),jlims(2));
         else
             load(f_an,'sst','sst_an','lat','lon','year','month')
-            f_hw = sprintf('%s/oisst_cmip_future_mhw_%dperc',dir,threshold);
-            fout = sprintf('%s/thermal_displacement_future_%dperc_%d-%d_%d-%d.mat',dir,threshold,ilims(1),ilims(2),jlims(1),jlims(2));
+            f_hw = sprintf('%s/oisst_cmip_future_mhw_%dperc_rcp%d',dir,threshold,rcp);
+            fout = sprintf('%s/thermal_displacement_future_%dperc_rcp%d_%d-%d_%d-%d.mat',dir,threshold,rcp,ilims(1),ilims(2),jlims(1),jlims(2));
         end
 end
 load(f_hw,'ishw')
@@ -131,9 +134,9 @@ for ii = ilims(1):ilims(2)
                 end
             case 'future'
                 if is_detrend == 1
-                    fname_tmp = sprintf('~/Dropbox/MHW/Data/thermal_displacement_future_%dperc_detrended_%d-%d_%d-%d.mat',threshold,ilims(1),ii,jlims(1),jlims(2));
+                    fname_tmp = sprintf('~/Dropbox/MHW/Data/thermal_displacement_future_%dperc_detrended_rcp%d_%d-%d_%d-%d.mat',threshold,rcp,ilims(1),ii,jlims(1),jlims(2));
                 else
-                    fname_tmp = sprintf('~/Dropbox/MHW/Data/thermal_displacement_future_%dperc_%d-%d_%d-%d.mat',threshold,ilims(1),ii,jlims(1),jlims(2));
+                    fname_tmp = sprintf('~/Dropbox/MHW/Data/thermal_displacement_future_%dperc_rcp%d_%d-%d_%d-%d.mat',threshold,rcp,ilims(1),ii,jlims(1),jlims(2));
                 end
         end
         fprintf('Saving partial file to %s\n',fname_tmp)

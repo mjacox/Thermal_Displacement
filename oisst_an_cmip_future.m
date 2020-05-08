@@ -1,7 +1,12 @@
-function oisst_an_cmip_future
+function oisst_an_cmip_future(rcp)
 % ========================================
 % Calculate future monthly SST anomalies based on historical
 % OISSTv2 data plus mean change from CMIP5 ensemble
+%
+%   oisst_an_cmip_future(rcp)
+%
+% Input:
+%   rcp: RCP scenario as numeric input (26, 45, or 85)
 %
 % Uses same methodology as oisst_an.m
 %
@@ -11,7 +16,7 @@ function oisst_an_cmip_future
 % ========================================
 % SET KEY PARAMETERS
 % ========================================
-clim_years = [1982 2010]; % Range of years to use for climatology
+clim_years = [1982 2011]; % Range of years to use for climatology
 dirout = '~/Dropbox/MHW/Data'; % output directory
 
 % ========================================
@@ -20,7 +25,7 @@ dirout = '~/Dropbox/MHW/Data'; % output directory
 fprintf('\nLoading OISST data\n')
 
 % Load OISST
-load ~/Dropbox/MHW/Data/oisst_an_1982-2019 sst year month lon lat
+load ~/Dropbox/MHW/Data/oisst_an_1982-2019 sst year month lon lat lsm
 lon_oisst = lon;
 lat_oisst = lat;
 
@@ -30,8 +35,8 @@ lat_oisst = lat;
 fprintf('Applying CMIP5 SST change\n')
 
 % Load CMIP5 output
-f_cmip_his = '~/Dropbox/MHW/Data/sst.CMIP5.ENSMN.mon.clim.1982-2010.nc';
-f_cmip_fut = '~/Dropbox/MHW/Data/sst.CMIP5.rcp85.ENSMN.mon.clim.2070-2099.nc';
+f_cmip_his = sprintf('~/Dropbox/MHW/Data/sst.CMIP5.ENSMN.hist-rcp%d.mon.clim.1982-2011.nc',rcp);
+f_cmip_fut = sprintf('~/Dropbox/MHW/Data/sst.CMIP5.ENSMN.rcp%d.mon.clim.2070-2099.nc',rcp);
 lon_cmip = ncread(f_cmip_his,'lon');
 lat_cmip = ncread(f_cmip_his,'lat');
 sst_cmip_his = ncread(f_cmip_his,'sst');
@@ -81,7 +86,7 @@ for ii = 1:nx
 end
 
 % Save
-clearvars -except lat lon lsm month year sst*
-fname = sprintf('%s/oisst_cmip_future_an',dirout);
+fname = sprintf('%s/oisst_cmip_future_an_rcp%d',dirout,rcp);
+clearvars -except lat lon lsm month year sst* fname
 fprintf('Saving SST anomalies to %s\n',fname)
 save('-v7.3',fname)
